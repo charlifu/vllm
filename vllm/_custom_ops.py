@@ -196,8 +196,9 @@ def scaled_fp8_quant(
         vllm_ops.dynamic_scaled_fp8_quant(output, input, scale)
     else:
         vllm_ops.static_scaled_fp8_quant(output, input, scale)
+    output = output.to(torch.float16) / 2.0
     output = output.to(torch.float8_e4m3fnuz)
-    return output, scale
+    return output, scale * 2.0
 
 
 # moe
