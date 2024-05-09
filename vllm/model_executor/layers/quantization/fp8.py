@@ -123,7 +123,7 @@ class Fp8LinearMethod(LinearMethodBase):
         layer.logical_widths = output_partition_sizes
 
         # WEIGHT
-        weight_dtype = (torch.float8_e4m3fn
+        weight_dtype = (torch.float8_e4m3fnuz
                         if self.quant_config.is_checkpoint_fp8_serialized else
                         params_dtype)
         weight = Parameter(torch.empty(output_size_per_partition,
@@ -253,9 +253,9 @@ def all_close_1d(x: torch.Tensor) -> bool:
 
 def per_tensor_quantize(tensor: torch.Tensor,
                         inv_scale: float) -> torch.Tensor:
-    finfo = torch.finfo(torch.float8_e4m3fn)
+    finfo = torch.finfo(torch.float8_e4m3fnuz)
     qweight = (tensor / inv_scale).clamp(min=finfo.min, max=finfo.max)
-    return qweight.to(torch.float8_e4m3fn)
+    return qweight.to(torch.float8_e4m3fnuz)
 
 
 def per_tensor_dequantize(tensor: torch.Tensor,
