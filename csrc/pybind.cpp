@@ -70,11 +70,7 @@ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
                 "Convert the key and value cache to fp8 data type");
   
   ops.def("fp8_gemm", &fp8_gemm, "fp8 GEMM");
-  ops.def("bf8_gemm", &bf8_gemm, "bf8 GEMM");
-
   ops.def("fp8_gemm_16", &fp8_gemm_16, "fp8 GEMM");
-  ops.def("fp8_gemm_new", &fp8_gemm_new, "fp8 GEMM");
-  ops.def("fp8_gemm_16_new", &fp8_gemm_16_new, "fp8 GEMM");
 
   ops.def("static_scaled_int8_quant", &static_scaled_int8_quant,
           "Compute int8 quantized tensor for given scaling factor");
