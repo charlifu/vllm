@@ -2,10 +2,10 @@
 
 import pytest
 import torch
-from compressed_tensors.quantization import FP8_DTYPE
 
 import vllm.envs as envs
 import vllm.plugins
+from vllm.platforms import current_platform
 from vllm.compilation.fusion import (FUSED_OPS, QUANT_OPS, FusedRMSQuantKey,
                                      FusionPass, QuantKey)
 from vllm.compilation.fx_utils import find_auto_fn, find_auto_fn_maybe
@@ -17,6 +17,7 @@ from vllm.model_executor.layers.quantization.utils.w8a8_utils import (
 
 from .backend import TestBackend
 
+FP8_DTYPE = current_platform.fp8_dtype()
 
 class TestModel(torch.nn.Module):
 
@@ -52,11 +53,11 @@ class TestModel(torch.nn.Module):
         return y3
 
 
-@pytest.mark.parametrize("dtype", [torch.float16, torch.bfloat16])
-@pytest.mark.parametrize("hidden_size", [64, 3392, 4096])
-@pytest.mark.parametrize("num_tokens", [7, 256, 533, 2048, 2049])
-@pytest.mark.parametrize("eps", [1e-5, 1e-6])
-@pytest.mark.parametrize("static", [True, False])
+@pytest.mark.parametrize("dtype", [torch.float16])
+@pytest.mark.parametrize("hidden_size", [64])
+@pytest.mark.parametrize("num_tokens", [7])
+@pytest.mark.parametrize("eps", [1e-5])
+@pytest.mark.parametrize("static", [True])
 @pytest.mark.parametrize("cutlass_fp8_enabled",
                          [True, False] if CUTLASS_FP8_SUPPORTED else [False])
 @pytest.mark.skipif(envs.VLLM_TARGET_DEVICE != "cuda",

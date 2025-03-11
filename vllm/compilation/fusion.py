@@ -5,14 +5,14 @@ from typing import Callable, Dict, List, NamedTuple, Optional, Tuple
 import torch
 import torch._inductor.pattern_matcher as pm
 # TODO(luka) use vllm.utils once #10836 landed
-from compressed_tensors.quantization import FP8_DTYPE
 from torch import fx
-from torch._higher_order_ops.auto_functionalize import auto_functionalized
+from torch._higher_order_ops.auto_functionalize import auto_functionalized_v2 as auto_functionalized
 from torch._inductor.pattern_matcher import PatternMatcherPass
 from torch._ops import OpOverload
 
 from vllm.config import CompilationConfig
 from vllm.logger import init_logger
+from vllm.platforms import current_platform
 
 from .fx_utils import find_getitem_maybe
 from .multi_output_match import MultiOutputMatch
@@ -32,6 +32,7 @@ def empty_fp32(*args, **kwargs):
 RMS_OP = torch.ops._C.rms_norm.default
 RMS_ADD_OP = torch.ops._C.fused_add_rms_norm.default
 
+FP8_DTYPE = current_platform.fp8_dtype()
 
 class QuantKey(NamedTuple):
     """
@@ -604,6 +605,7 @@ class FusionPass(VllmInductorPass):
     def __call__(self, graph: fx.Graph):
         self.begin()
         self.dump_graph(graph, "before_fusion")
+        print(graph.print_tabular())
 
         count = self.patterns.apply(graph)
         logger.debug("Replaced %s patterns", count)
@@ -613,5 +615,6 @@ class FusionPass(VllmInductorPass):
         self.process_matches(graph)
         logger.debug("Post-processed %s matches", len(self.matches))
         self.dump_graph(graph, "after_fusion")
+        print(graph.print_tabular())
         self.matches.clear()
         self.end_and_log()

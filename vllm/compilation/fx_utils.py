@@ -4,7 +4,7 @@ import operator
 from typing import Iterable, Optional
 
 from torch import fx
-from torch._higher_order_ops.auto_functionalize import auto_functionalized
+from torch._higher_order_ops.auto_functionalize import auto_functionalized_v2 as auto_functionalized
 from torch._ops import OpOverload
 
 
